@@ -4,10 +4,10 @@
 \name{blblm-package}
 \alias{blblm}
 \alias{blblm-package}
-\title{blblm: What the Package Does (Title Case)}
+\title{blblm: Enabling Parallelization for Regression Analysis}
 \description{
-More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+A package that applies parallelization when conducting any regression analysis. Provides quicker 
+                usage time, along with the use of confidence intervals to pinpoint accurate data.
 }
 \details{
 Linear Regression with Little Bag of Bootstraps

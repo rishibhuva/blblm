@@ -12,14 +12,31 @@ utils::globalVariables(c("."))
 
 
 #' @export
-blblm <- function(formula, data, m = 10, B = 5000) {
-  data_list <- split_data(data, m)
-  estimates <- map(
-    data_list,
-    ~ lm_each_subsample(formula = formula, data = ., n = nrow(data), B = B))
-  res <- list(estimates = estimates, formula = formula)
-  class(res) <- "blblm"
-  invisible(res)
+blblm <- function(formula, data, m = 10, B = 5000, parallel = TRUE) {
+  if(parallel == TRUE){
+    plan(multiprocess, workers = 8)
+    data_list <- split_data(data, m)
+    estimates <- future_map(
+      data_list,
+      ~ lm_each_subsample(formula = formula, data = ., n = nrow(data), B = B))
+    res <- list(estimates = estimates, formula = formula)
+    class(res) <- "blblm"
+    invisible(res)
+
+  }
+  else{
+    plan(multiprocess, workers = 1)
+    data_list <- split_data(data, m)
+    estimates <- map(
+      data_list,
+      ~ lm_each_subsample(formula = formula, data = ., n = nrow(data), B = B))
+    res <- list(estimates = estimates, formula = formula)
+    class(res) <- "blblm"
+    invisible(res)
+
+  }
+
+
 }
 
 
@@ -146,3 +163,4 @@ map_cbind <- function(.x, .f, ...) {
 map_rbind <- function(.x, .f, ...) {
   map(.x, .f, ...) %>% reduce(rbind)
 }
+

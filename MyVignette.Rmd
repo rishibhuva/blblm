@@ -1,0 +1,168 @@
+---
+title: "introduction to blblm "
+author: "Rishi Bhuva"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE, eval = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Linear regression models are used for primarily 3 reasons:
+
+- Determining the strength of predictors
+
+- Forcasting an effect 
+
+- Trend forcasting
+
+
+This blblm package enables data to easily fit a linear regression model by performing a bag of little bootstrap for the given model.
+
+Within this package, we have the following functions:
+
+
+
+blblm-package: Enabling Parallelization/Bootstraps for Regression Analysis
+
+blbcoef:	compute the coefficients from fit
+
+blblm: 	bag of little bootstrap for linear regression model
+
+blbsigma:	compute sigma from fit
+
+split_data:	split data into m parts of approximated equal sizes
+
+The main functions needed in order to compute analysis for linear regression using parallelization can be seen below:
+
+
+1.) blbcoef:
+Format:
+
+blbcoef(fit)
+
+This function computes the coefficient from fit. 
+
+
+
+The coeffiecients that blbcoef() output are in terms of a list. 
+
+2.) blblm:
+
+
+Format:
+
+blblm(formula, data, m = 10, B = 5000, Parallel = FALSE))
+
+
+This function performs a bag of little bootstraps for a linear regression model. 
+
+formula = formula used in blblm
+
+data = data
+
+m = number of splits
+
+B = number of bootstraps
+
+Parallel = boolean value if parallelization wants to be used
+
+Examples:
+
+```{r}
+library(blblm)
+head(mtcars)
+```
+ 
+We will be showing the use of the blblm package by using the dataset: mtcars. 
+This data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973--74 models).
+[1]	mpg	Miles/(US) gallon
+[2]	cyl	Number of cylinders
+[3]	disp Displacement (cu.in.)
+[4]	hp Gross horsepower
+[5]	drat Rear axle ratio
+[6]	wt Weight (1000 lbs)
+[7]	qsec 1/4 mile time
+[8]	vs Engine (0 = V-shaped, 1 = straight)
+[9]	am Transmission (0 = automatic, 1 = manual)
+[10] gear Number of forward gears
+
+```{r, warning=FALSE, eval = FALSE}
+x = blblm(mpg ~ wt * hp, data = mtcars, m = 3, B = 100, parallel = FALSE)
+y = blblm(mpg ~ wt * hp, data = mtcars, m = 3, B = 100, parallel = TRUE)
+coef(x)
+coef(y)
+blbcoef(x)
+blbcoef(y)
+```
+
+Here, we can see the model of fitness that x and y both conduct. One uses parallelization while the other does not use parallelization. We can also see the comparision of the coef() function and the blbcoef() function. blbcoef() tends to be more geared toward models that get formed through the blblm() function. Parallelization increases the speed of computation. Parallel computation is essentially the simultaneous execution of different pieces of a larger computation across multiple computing processors or cores. As we can see, we are essentially looking at the miles per gallon and comparing it to the weight and the horsepower.
+
+3.) blbsigma
+
+Format: 
+
+blbsigma(fit)
+
+
+blbsigma computes sigma from the fit. This function is also mainly geared toward a fit that can potentially include parallelization as seen in the blblm() function.
+Sigma extracts the residual standard deviation from a function.
+
+Example:
+```{r, eval = FALSE}
+sigma(x)
+sigma(y)
+```
+
+
+
+Example of blblm:
+
+```{r, eval = FALSE}
+sigma(x, confidence = TRUE)
+```
+
+Here, we get a confidence interval with data not using parallelization. We get a confidence interval stating out sigma and the lower and upper bound of our sigma. 
+
+```{r, eval = FALSE}
+sigma(y, confidence = TRUE)
+```
+
+Here, we get a confidence interval with data using parallelization. We get a confidence interval stating out sigma and the lower and upper bound of our sigma.
+
+```{r, eval = FALSE}
+predict(x, data.frame(wt = c(2.5, 3), hp = c(150, 170)))
+```
+
+Here, we get a prediction interval with certain bounds on the weight and horsepower (referring to our dataset: mtcars), and then use our sigma to properly create this prediction interval. As we can see, the data that we use, we do not reference parallelization.
+```{r, eval = FALSE}
+predict(y, data.frame(wt = c(2.5, 3), hp = c(150, 170)))
+```
+
+
+Here, we get a prediction interval with certain bounds on the weight and horsepower (referring to our dataset: mtcars), and then use our sigma to properly create this prediction interval. As we can see, the data that we use, we do reference parallelization.
+
+```{r, eval = FALSE}
+predict(x, data.frame(wt = c(2.5, 3), hp = c(150, 170)), confidence = TRUE)
+```
+Here, we get a prediction interval with certain bounds on the weight and horsepower (referring to our dataset: mtcars) and we also have a confidence interval which makes our data a bit more accurate. Then we use our sigma to properly create this prediction interval. As we can see, the data that we use, we do not reference parallelization.
+
+```{r, eval = FALSE}
+predict(y, data.frame(wt = c(2.5, 3), hp = c(150, 170)), confidence = TRUE)
+```
+
+Here, we get a prediction interval with certain bounds on the weight and horsepower (referring to our dataset: mtcars) and we also have a confidence interval which makes our data a bit more accurate. Then we use our sigma to properly create this prediction interval. As we can see, the data that we use, we do reference parallelization.
+
+
+
+Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+
+
